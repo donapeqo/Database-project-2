@@ -45,18 +45,18 @@
       <th scope="row">1</th>
       <td>
       <ul>
-      	<li>Movie Name: Tangled</li>
-      	<li>Description: Blah</li>
-      	<li>Rating:4 out of 5 stars</li>
+      	<li>Movie Name: ${movieBean.title} </li>
+      	<li>Description: ${movieBean.description}</li>
+      	<li>Rating: ${movieBean.rating} </li>
       </ul>
       </td>
       <td>
       <ul>
-      	<li>Theatre Name: Lincoln Marcus Theatre</li>
-      	<li>Theatre Number: 12</li>
-      	<li>Showtime: 15:00</li>
-      	<li>Price per Seat:$4.99</li>
-      	<li>Available Seats:10</li>
+      	<li>Theatre Name: ${showingBean.theatreName}</li>
+      	<li>Theatre Number: ${showingBean.showroom}</li>
+      	<li>Showtime: ${showingBean.startDateTime }</li>
+      	<li>Price per Seat:$${showingBean.price}</li>
+      	<li>Available Seats:${showingBean.availableSeats}</li>
       </ul>      
       </td>
       

@@ -27,11 +27,7 @@
 <br> <br>
 	
 		<h1 align="center"> Movie Search Results</h1> <br><br>
-		<% 
-	String result = request.getParameter("Res"); 
-
-	%>
-<h2 align="center">You searched for the movie: <%= result %> </h2>
+<h2 align="center">You searched for the movie: ${movieBean.title}</h2>
 		
  <h4>Movie Details </h4>
 <table class="table table-striped">
@@ -48,19 +44,19 @@
       <th scope="row">1</th>
       <td>
       <ul>
-      	<li>Theatre Name: Lincoln Marcus Theatre</li>
-      	<li>Theatre Number: 12</li>
-      	<li>Showtime: 1500</li>
-      	<li>Available seats: 10</li><br> <a href="MovieDetailsAndSelection.jsp"><button class="btn btn-outline-info btn-sm">View Details</button></a>
+      	<li>Theatre Name: ${showingBean.theatreName}</li>
+      	<li>Theatre Number: ${showingBean.showroom}</li>
+      	<li>Showtime: ${showingBean.startDateTime}</li>
+      	<li>Available seats: ${showingBean.availableSeats}</li><br> <a href="MovieDetailsAndSelection.jsp"><button class="btn btn-outline-info btn-sm">View Details</button></a>
       	
       </ul>
       </td>
       <td>
-	 	Price: $4.99    
+	 	Price: $${showingBean.price}    
       </td>
       
       <td>
-      <img src="Pic/Tangled.jpg" class="img-thumbnail" style="width:200px;height:200px;">
+      <img src="Pic/Tangled.jpg"  class="img-thumbnail" style="width:200px;height:200px;">
       </td>
     </tr>
 

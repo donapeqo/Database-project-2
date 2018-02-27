@@ -1,11 +1,6 @@
 package lecture464.servlet;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Properties;
-
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -37,13 +32,12 @@ public class Register extends HttpServlet {
 		String lastName = request.getParameter("lastName");
 		String add = request.getParameter("address");
 		String ph = request.getParameter("phone");
-		int phone = Integer.parseInt(ph); 
 		
 		/*From Assignment 1 */
 		String userName = request.getParameter("userName");
 		String password = request.getParameter("password");
 		
-		Users aUser = new Users(userName, password,firstName,lastName,add,phone);
+		Users aUser = new Users(userName, password,firstName,lastName,add,ph);
 		
 		UsersDB aUserDB = new UsersDB();
 		

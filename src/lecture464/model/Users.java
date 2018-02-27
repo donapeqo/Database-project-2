@@ -17,15 +17,13 @@ public class Users {
 	private String firstName;
 	private String lastName;
 	private String address;
-	private int phone;
+	private String phone;
 	
 	public Users() {
 		super();
 	}
 	
-	
-
-	public Users(String userName, String password, String firstName, String lastName, String address, int phone) {
+	public Users(String userName, String password, String firstName, String lastName, String address, String phone) {
 		super();
 		this.userName = userName;
 		this.password = password;
@@ -55,10 +53,10 @@ public class Users {
 	public void setAddress(String address) {
 		this.address = address;
 	}
-	public int getPhone() {
+	public String getPhone() {
 		return phone;
 	}
-	public void setPhone(int phone) {
+	public void setPhone(String phone) {
 		this.phone = phone;
 	}
 	public String getUserName() {

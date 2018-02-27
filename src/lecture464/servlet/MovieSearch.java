@@ -1,6 +1,7 @@
 package lecture464.servlet;
 
 import java.io.IOException;
+
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -8,19 +9,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import lecture464.db.UsersDB;
-import lecture464.model.*;
+import lecture464.db.MovieShowingDB;
+import lecture464.db.MoviesDB;
+import lecture464.model.Movie;
+import lecture464.model.MovieShowing;
 
 /**
- * Servlet implementation class Login
+ * Servlet implementation class MovieSearch
  */
-public class Login extends HttpServlet {
+public class MovieSearch extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public Login() {
+    public MovieSearch() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -28,43 +31,39 @@ public class Login extends HttpServlet {
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
-    
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String userName = request.getParameter("userName");
-		String password = request.getParameter("password");
+		// TODO Auto-generated method stub
+		String query = request.getParameter("Res");
+		boolean movieExists = false;
 		
-		boolean userExists = false;
-		boolean userPasswordMatches = false;
+		Movie aMovie = new Movie();
+		MoviesDB aMovieDB = new MoviesDB();
 		
-		Users aUser = new Users();
+		MovieShowing ms = new MovieShowing();
+		MovieShowingDB msdb = new MovieShowingDB();
 		
-		UsersDB aUserDB = new UsersDB();
 		
-		userExists = aUserDB.validateUserByUsername(userName);
-		userPasswordMatches = aUserDB.validateUserByPassword(password);
 		
-		if(userExists && userPasswordMatches) {
-			aUser = aUserDB.getUser(userName);
-			
-			HttpSession session = request.getSession();
-		    session.setAttribute("userBean", aUser);
-		    
-		    String address = "CustomerHomepage.jsp";
-		    RequestDispatcher dispatcher =
-		      request.getRequestDispatcher(address);
-		    dispatcher.forward(request, response);
-			
-		} else {
-			response.sendRedirect("Register.jsp");
-		}
+		movieExists = aMovieDB.validateMovieByName(query);
+		if (movieExists) {
+			aMovie = aMovieDB.getMovie(query);
+			ms = msdb.getMovieShowing(aMovie.getID());
 
-		
+			HttpSession session = request.getSession();
+			session.setAttribute("movieBean", aMovie);
+			session.setAttribute("showingBean", ms);
+			String address ="MovieSearchResults.jsp";
+			RequestDispatcher dispatcher = 
+					request.getRequestDispatcher(address);
+			dispatcher.forward(request, response);
+		}
 	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
 

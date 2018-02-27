@@ -25,6 +25,34 @@ public class Database {
 	static final String USER = "nabdulha"; // Replace with your CSE_LOGIN
 	static final String PASS = "JaxUM6";   // Replace with your CSE MySQL_PASSWORD
 	
+	
+	public void connectMeIn() {
+		try{
+			//Register the JDBC driver
+			Class.forName("com.mysql.jdbc.Driver");			
+		}catch(ClassNotFoundException e){
+			System.err.println(e);
+			System.exit (-1);
+		}
+		try {
+			 //Open a connection
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+		} catch (SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
+	
+	public void closeConnection(){
+		try {
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	/** ***** USERS ***** **/
 	public void createUsersTable() {
 		  
 		try {
@@ -53,7 +81,6 @@ public class Database {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 		}
-		
 		
 	}
 	
@@ -86,7 +113,7 @@ public class Database {
 	}
 	
 	
-	public boolean findUserByUsername(String aUserName) {
+	public boolean findUserByUsername(String aUserName) { //check for registration
 		boolean userExists = false;
 		String SQL = "SELECT * from Users";
 	    Statement stat;
@@ -109,7 +136,7 @@ public class Database {
 		return userExists;
 	}
 	
-	public boolean findUserByPassword(String password) {
+	public boolean findUserByPassword(String password) { //check login credentials
 		boolean passwordMatches = false;
 		String SQL = "SELECT * from Users";
 	    Statement stat;
@@ -179,19 +206,21 @@ public class Database {
 			e.printStackTrace();
 		}
 	}
-	//MoviesDBQuery
-	public void displaymoviesTable(String aMovie ) {
-		
-		
-		String SQL = "SELECT * from Movies where Movie_Name = '"+aMovie+"'";
+	
+	/** ***** MOVIES ***** **/
+	
+	public boolean findMovieByName(String aMovieName) { //Worked. Checked
+		boolean movieExists = false;
+		String SQL = "SELECT * from Movies where Movie_Name = '"+ aMovieName +"';";
 	    Statement stat;
 		try {
 			stat = conn.createStatement();
 			ResultSet rs = stat.executeQuery(SQL);
 			
-			while (rs.next()){
-		        System.out.println(rs.getString(1) + " " + rs.getString(2) +  " " + rs.getString(3))
-		        		 ;
+			while (rs.next()){	
+				if(aMovieName.equals( rs.getString(2) )) {
+					movieExists = true;
+				}    
 		    }
 			
 		    stat.close();
@@ -199,19 +228,99 @@ public class Database {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		
+		return movieExists;
 	}
-	//OrderItemQuery
-public void displayorderitemsTable(int a) {
+	
+	public Movie returnMovieByName(String aMovieName) {
+		String SQL = "SELECT * from Movies WHERE Movie_Name='"+aMovieName+"';";
+	    Statement stat;
+	   
+	    Movie aMovie = new Movie();
+		try {
+			stat = conn.createStatement();
+			ResultSet rs = stat.executeQuery(SQL);
+			
+			while (rs.next()){
+					aMovie.setTitle(rs.getString("Movie_Name"));
+					aMovie.setDescription(rs.getString("Description"));
+					aMovie.setRating(rs.getString("Rating"));
+					aMovie.setID(rs.getString("ID"));
+				 
+		    }
+			
+		    stat.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return aMovie;
 		
 		
-		String SQL = "SELECT Quantity from orderitems where ID="+a+";";
+	}
+	
+	public MovieShowing returnMovieShowingByMovieID(String movieID) {
+		String SQL = "SELECT * from MovieShowing WHERE MovieID = '"+ movieID +"';";
+		
+	    Statement stat;
+	    MovieShowing ms = new MovieShowing();
+	    String theatreNum ="";
+	    String showroom_num = "";
+	    
+	    try {
+	    	stat = conn.createStatement();
+	    	ResultSet rs = stat.executeQuery(SQL);
+			
+	    	while (rs.next()){
+					ms.setPrice(rs.getString("Price"));
+					ms.setStartDateTime(rs.getString("Start_Time"));
+					ms.setShowroom(rs.getString("ShowroomID"));
+					showroom_num= rs.getString("ShowroomID");
+		    }
+		    stat.close();
+	    	
+	    } catch (SQLException e) {
+			e.printStackTrace();
+		}
+	    
+	    try {
+	    	stat = conn.createStatement();
+	    	String SQL2 = "SELECT * FROM Showrooms WHERE ID = '"+ showroom_num +"';";
+	    	ResultSet rs = stat.executeQuery(SQL2);
+	    	
+	    	while (rs.next()){
+	    			ms.setAvailableSeats(rs.getString("Available_Seats"));
+					theatreNum = rs.getString("TheatreID");
+		    }
+
+	    	
+	    } catch (SQLException e) {
+	    	e.printStackTrace();
+	    }
+	    
+	    try {
+	    	stat = conn.createStatement();
+	    	String SQL3 = "SELECT * FROM Theatres WHERE ID = '"+theatreNum+"'";
+	    	ResultSet rs = stat.executeQuery(SQL3);
+	    	
+	    	while (rs.next()){
+    			ms.setTheatreName(rs.getString("Theatre_Name"));	
+	    	}
+	    } catch (SQLException e) {
+	    	e.printStackTrace();
+	    }
+		
+		return ms;
+	}
+	
+	public void displayAllMovies() {
+		String SQL = "SELECT * from Movies";
 	    Statement stat;
 		try {
 			stat = conn.createStatement();
 			ResultSet rs = stat.executeQuery(SQL);
 			
 			while (rs.next()){
-		        System.out.println(rs.getString(1) + " " + rs.getString(2) +  " " + rs.getString(3)
+		        System.out.println(rs.getString("ID") + " " + rs.getString(2) +  " " + rs.getString("Description")
 		        		+ " " + rs.getString(4) + " " + rs.getString(5));
 		    }
 			
@@ -220,102 +329,83 @@ public void displayorderitemsTable(int a) {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-}
-		//ordersQuery
-public void displayordersTable(int a) {
-	
-	
-	String SQL = "SELECT UserId, TotalCost, OrderDate, BIlling Address, CreditCardNumber from orders where ID="+a+";";
-    Statement stat;
-	try {
-		stat = conn.createStatement();
-		ResultSet rs = stat.executeQuery(SQL);
-		
-		while (rs.next()){
-	        System.out.println(rs.getString(1) + " " + rs.getString(2) +  " " + rs.getString(3)
-	        		+ " " + rs.getString(4) + " " + rs.getString(5));
-	    }
-		
-	    stat.close();
-	        
-	} catch (SQLException e) {
-		e.printStackTrace();
 	}
-}
-
-public void displaycreditcardsTable(int a) {
 	
-	
-	String SQL = "SELECT CardHolderName, CardCreditNumber, Balance, CardType, UserID, CVV, ExpirationDate from creditcards where ID="+a+";";
-    Statement stat;
-	try {
-		stat = conn.createStatement();
-		ResultSet rs = stat.executeQuery(SQL);
-		
-		while (rs.next()){
-	        System.out.println(rs.getString(1) + " " + rs.getString(2) +  " " + rs.getString(3)
-	        		+ " " + rs.getString(4) + " " + rs.getString(5));
-	    }
-		
-	    stat.close();
-	        
-	} catch (SQLException e) {
-		e.printStackTrace();
-	}
-}
-
-public void displaycustomerReviewTable(int a) {
-	
-	
-	String SQL = "SELECT * from customerreviews where ID="+a+";";
-    Statement stat;
-	try {
-		stat = conn.createStatement();
-		ResultSet rs = stat.executeQuery(SQL);
-		
-		while (rs.next()){
-	        System.out.println(rs.getString(1) + " " + rs.getString(2) +  " " + rs.getString(3)
-	        		+ " " + rs.getString(4) + " " + rs.getString(5));
-	    }
-		
-	    stat.close();
-	        
-	} catch (SQLException e) {
-		e.printStackTrace();
-	}
-}
-		
-		
-		
-	
-	
-
-
-	public void connectMeIn() {
-		try{
-			//Register the JDBC driver
-			Class.forName("com.mysql.jdbc.Driver");			
-		}catch(ClassNotFoundException e){
-			System.err.println(e);
-			System.exit (-1);
-		}
+	public void displayAllMovieShowings() {
+		String SQL = "SELECT * from MovieShowing";
+	    Statement stat;
 		try {
-			 //Open a connection
-			conn = DriverManager.getConnection(DB_URL, USER, PASS);
-		} catch (SQLException e){
-			e.printStackTrace();
-		}
-	}
-	
-	
-	public void closeConnection(){
-		try {
-			conn.close();
+			stat = conn.createStatement();
+			ResultSet rs = stat.executeQuery(SQL);
+			
+			while (rs.next()){
+		        System.out.println(rs.getString("ID") + " " + rs.getString(2) +  " " + rs.getString("Number_Purchased")
+		        		+ " " + rs.getString(4) + " " + rs.getString(5)+ " " + rs.getString(6)+ " " + rs.getString(7));
+		    }
+			
+		    stat.close();
+		        
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
+
+	/** ***** THEATRES ***** **/
+	
+	public Theatres returnTheatreByName(String tName) {
+		String SQL = "SELECT * from Theatres";
+	    Statement stat;
+	   
+	    Theatres aTheatre = new Theatres();
+		try {
+			stat = conn.createStatement();
+			ResultSet rs = stat.executeQuery(SQL);
+			
+			while (rs.next()){
+				if(tName.equals( rs.getString(2) )) {
+					aTheatre.setName(rs.getString(2));
+					aTheatre.setLocation(rs.getString(3));
+				} 
+		    }
+			
+		    stat.close();
+		        
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return aTheatre;
+	}
+	
+	/** ORDERS **/
+	public void addMovieToOrder(MovieShowing mv) {
+		  
+		try {
+		  stmt = conn.createStatement();
+		  String sql;
+		  
+		  String firstName = aUser.getFirstName();
+		  String lastName = aUser.getLastName();
+		  String userName = aUser.getUserName();
+		  String password = aUser.getPassword();
+		  
+
+		  sql = "INSERT INTO Users (First_Name, Last_Name, User_Name, Password)" +
+		          "VALUES ('" + firstName +
+				  "', '" + lastName + 
+				  "', '" + userName + 
+				  "', '" + password + "')";
+		  stmt.executeUpdate(sql);
+		  
+		  
+		  } catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+		}
+		
+	}
+	
 
 
 }

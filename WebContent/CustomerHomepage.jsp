@@ -28,7 +28,7 @@
 <center>
 	<h1>Welcome to Marcus Theatre</h1>
 	
-		<form name="SR" action=MovieSearchResults.jsp  method="post">
+		<form name="SR" action=MovieSearch  method="post">
 			<div class="form-row align-items-center">
 					<div class="col-lg-3">
 			<input type=text name=Res placeholder="Search Moives Here" class=form-control id="inlineFormInput"></div>
